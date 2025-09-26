@@ -1,0 +1,31 @@
+---
+- hosts: webservers
+  user: ansible
+  become: true
+  connection: ssh
+  tasks:
+
+    - name: Install Git on Host Machines
+      action: yum pkg=git state=present
+
+    - name: Install HTTPD on Host Machines
+      action: yum pkg=httpd state=present
+
+    - name: Start HTTPD Server on Host Machines
+      action: service name=httpd state=started
+
+    - name: Clone Flipkart-Clone GitHub Repository
+      git:
+        repo: https://github.com/Msocial123/Flipkart-Clone.git
+        dest: /var/www/html/flipkart-clone
+        version: HEAD
+
+    - name: Set permissions for web directory
+      file:
+        path: /var/www/html/flipkart-clone
+        owner: apache
+        group: apache
+        recurse: yes
+
+    - name: Restart HTTPD Server to apply changes
+      action: service name=httpd state=restarted
